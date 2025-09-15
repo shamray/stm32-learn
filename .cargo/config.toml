@@ -1,5 +1,8 @@
 [build]
-target = "thumbv8m.main-none-eabihf"
+target = "thumbv7em-none-eabihf"
 
-[target.thumbv8m.main-none-eabihf]
+[target.thumbv7em-none-eabihf]
 rustflags = ["-C", "link-arg=-Tmemory.ld"]
+
+
+# rust-analyzer will now use the build target above and not try to load the std test harness.

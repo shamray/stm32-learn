@@ -2,7 +2,7 @@
 #![no_main]
 #![allow(clippy::empty_loop)]
 
-mod startup_stm32f403;
+mod startup_stm32f401;
 
 use core::panic::PanicInfo;
 
@@ -11,7 +11,7 @@ const _NUMBERS: [i32; 5] = [9, 8, 7, 6, 5];
 static mut BUFFER: [u8; 1024] = [0; 1024];
 
 #[unsafe(no_mangle)]
-fn main() {
+pub extern "C" fn main() -> ! {
     let mut _total_score = 0;
 
     unsafe {
