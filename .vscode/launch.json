@@ -1,0 +1,21 @@
+{
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "cwd": "${workspaceFolder}",
+      "executable": "${workspaceFolder}/target/thumbv7em-none-eabihf/debug/my_first_mcu_project",
+      "name": "Debug with ST-Link",
+      "request": "launch",
+      "type": "cortex-debug",
+      "runToEntryPoint": "main",
+      "servertype": "stlink",
+      "svdFile": "C:/ST/STM32CubeCLT_1.19.0/STMicroelectronics_CMSIS_SVD/STM32F401.svd",
+      "device": "STM32F401",
+      "preLaunchTask": "rust: cargo build",
+      "showDevDebugOutput": "raw"
+    }
+  ]
+}

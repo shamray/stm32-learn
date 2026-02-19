@@ -1,6 +1,13 @@
-use core::ptr;
+#[no_mangle]
+extern "C" fn HardFault_Handler() { loop {} }
+#[no_mangle]
+extern "C" fn NMI_Handler() { loop {} }
+#[no_mangle]
+extern "C" fn Reset_Handler() { loop {} }
+#[no_mangle]
+extern "C" fn Default_Handler() { loop {} }
 
-unsafe extern "C" {
+extern "C" {
     fn BusFault_Handler();
     fn MemManage_Handler();
     fn PendSV_Handler();
@@ -63,20 +70,12 @@ unsafe extern "C" {
     fn USART6_Handler();
 }
 
-unsafe extern "C" {
-    static _sidata: u32;
-    static mut _sdata: u32;
-    static mut _edata: u32;
-    static mut _sbss: u32;
-    static mut _ebss: u32;
-}
-
 #[used]
-#[unsafe(link_section = ".isr_vector")]
+#[link_section = ".isr_vector"]
 static VECTOR_TABLE: [Option<unsafe extern "C" fn()>; 100] = [
-    Some(reset_handler),
-    Some(nmi_handler),
-    Some(hardfault_handler),
+    Some(Reset_Handler),
+    Some(NMI_Handler),
+    Some(HardFault_Handler),
     Some(MemManage_Handler),
     Some(BusFault_Handler),
     Some(UsageFault_Handler),
@@ -175,45 +174,3 @@ static VECTOR_TABLE: [Option<unsafe extern "C" fn()>; 100] = [
     None,
     Some(SPI4_Handler),
 ];
-
-#[unsafe(no_mangle)]
-extern "C" fn nmi_handler() {
-    loop {}
-}
-
-#[unsafe(no_mangle)]
-extern "C" fn hardfault_handler() {
-    loop {}
-}
-
-#[unsafe(no_mangle)]
-extern "C" fn default_handler() {
-    loop {}
-}
-
-#[unsafe(no_mangle)]
-unsafe extern "C" fn reset_handler() {
-    let mut src_is_flash = ptr::addr_of!(_sidata);
-    let mut dest_is_ram = ptr::addr_of_mut!(_sdata);
-    let data_end_in_ram = ptr::addr_of_mut!(_edata);
-
-    unsafe {
-        while dest_is_ram < data_end_in_ram {
-            *dest_is_ram = *src_is_flash;
-            dest_is_ram = dest_is_ram.add(1);
-            src_is_flash = src_is_flash.add(1);
-        }
-    }
-
-    let mut bss = ptr::addr_of_mut!(_sbss);
-    let bss_end = ptr::addr_of_mut!(_ebss);
-
-    unsafe {
-        while bss < bss_end {
-            *bss = 0;
-            bss = bss.add(1);
-        }
-    }
-
-    crate::main();
-}
