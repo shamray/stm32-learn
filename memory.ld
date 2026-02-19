@@ -30,7 +30,7 @@ SECTIONS
         . = ALIGN(4);
     } > FLASH
 
-    .data : 
+    .data (NOLOAD) : 
     {
         _sidata = LOADADDR(.data);
         . = ALIGN(4);
@@ -41,7 +41,7 @@ SECTIONS
         _edata = .;
     } > RAM AT > FLASH
 
-    .bss : 
+    .bss (NOLOAD): 
     {
         . = ALIGN(4);
         _sbss = .;
@@ -51,7 +51,7 @@ SECTIONS
         _ebss = .;
     } > RAM
 
-    .ram_usage_check : 
+    .ram_usage_check (NOLOAD) : 
     {
         . = ALIGN(8);
         . = . + _min_stack_size;
