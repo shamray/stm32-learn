@@ -2,8 +2,8 @@ ENTRY(reset_handler)
 
 MEMORY
 {
-    FLASH(rx)   : ORIGIN = 0x8000000, LENGTH = 256K
-    RAM (rwx)   : ORIGIN = 0x2000000, LENGTH = 64K
+    FLASH(rx)   : ORIGIN = 0x08000000, LENGTH = 256K
+    RAM (rwx)   : ORIGIN = 0x20000000, LENGTH = 64K
 }
 
 _start_of_stack = ORIGIN(RAM) + LENGTH(RAM);
@@ -30,9 +30,8 @@ SECTIONS
         . = ALIGN(4);
     } > FLASH
 
-    .data (NOLOAD) : 
+    .data : 
     {
-        _sidata = LOADADDR(.data);
         . = ALIGN(4);
         _sdata = .;
         *(.data)
@@ -40,6 +39,8 @@ SECTIONS
         . = ALIGN(4);
         _edata = .;
     } > RAM AT > FLASH
+
+    _sidata = LOADADDR(.data);
 
     .bss (NOLOAD): 
     {
