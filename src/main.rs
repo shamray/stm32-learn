@@ -20,27 +20,32 @@ pub const GPIOC_BASE: u32 = 0x4002_0800;
 pub const LED_PIN: u32 = GPIO_PIN_13;
 pub const LED_PORT: u32 = GPIOC_BASE;
 
+pub fn delay(duration: u32) {
+    for _ in 0..duration {}
+}
+
+pub fn blink_n(n: u8) {
+    const INTERVAL: u32 = 24000;
+
+    for i in 0..8 {
+        if i < n {
+            led_on(GPIOC_BASE, 13);
+        }
+        delay(INTERVAL);
+        led_off(GPIOC_BASE, 13);
+        delay(INTERVAL);
+    }
+
+    delay(INTERVAL * 8);
+}
+
 #[unsafe(no_mangle)]
 pub extern "C" fn main() -> ! {
-    // unsafe {
-    //     ptr::write_volatile(0x4002_3830 as *mut u32, 0x00000004);
-    // }
-    // unsafe { _ = ptr::read_volatile(0x4002_3830 as *mut u32) }
-
-    // unsafe {
-    //     ptr::write_volatile(0x4002_0800 as *mut u32, 0x04000000);
-    // }
-
     enable_gpio_clock(GPIOC_BASE);
     led_init(GPIOC_BASE, 13);
 
-    const INTERVAL: u32 = 64000;
-
     loop {
-        led_on(GPIOC_BASE, 13);
-        for _ in 0..INTERVAL {}
-        led_off(GPIOC_BASE, 13);
-        for _ in 0..INTERVAL {}
+        blink_n(80);
     }
 }
 
