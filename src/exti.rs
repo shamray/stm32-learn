@@ -4,10 +4,21 @@ use crate::{gpio::GPIOA_BASE, reg};
 
 pub const EXTI_BASE: u32 = 0x4001_3C00;
 pub const SYSCFG_BASE: u32 = 0x4001_3800;
+pub const RCC_BASE: u32 = 0x4002_3800;
 pub const EXTI0_IRQ: u32 = 6;
 pub enum EdgeTrigger {
     Rising,
     Falling,
+}
+
+fn enable_syscfg_clock() {
+    let rcc_apb2enr_addr = reg::addr(RCC_BASE, 0x44);
+    // Set bit 14 to enable SYSCFG clock
+    reg::set_bit(rcc_apb2enr_addr, 14, true);
+
+    unsafe {
+        core::ptr::read_volatile(rcc_apb2enr_addr);
+    }
 }
 
 pub fn set_edge(pin: u32, trigger: EdgeTrigger) {
@@ -30,6 +41,8 @@ pub fn enable_interrupt(line: u32) {
 }
 
 pub fn init_syscfg(port: u32, pin: u32) {
+    enable_syscfg_clock();
+
     let reg_offset = (pin / 4) * 4;
     let exti_imr_addr = reg::addr(SYSCFG_BASE, 0x08 + reg_offset);
     let bit_position = (pin % 4) * 4;
