@@ -46,7 +46,10 @@ pub fn gpio_init_mode(port: u32, pin: u32, mode: Mode) {
             };
             reg_set_bits(gpio_output_type_reg_addr, pin, output_type_value, 0x1);
         }
-        Mode::Input => {}
+        Mode::Input => {
+            let gpio_pupd_reg_addr = reg_addr(port, 0x0C);
+            reg_set_bits(gpio_pupd_reg_addr, pin, 0x1, 0x3);
+        }
     }
 }
 
@@ -74,6 +77,13 @@ fn reg_set_bits(reg_addr: *mut u32, bit_position: u32, bit_val: u32, bit_mask: u
     unsafe { ptr::write_volatile(reg_addr, reg_value) }
 }
 
+pub fn reg_get_bit(reg_addr: *mut u32, bit: u32) -> bool {
+    unsafe {
+        let reg_value = ptr::read_volatile(reg_addr);
+        (reg_value & (1 << bit)) != 0
+    }
+}
+
 pub fn gpio_enable_clock(port: u32) {
     let rcc_ahb1enr_offset = 0x30;
     let rcc_ahb1enr_addr = (RCC_BASE + rcc_ahb1enr_offset) as *mut u32;
@@ -98,4 +108,9 @@ pub fn gpio_set_pin(port: u32, pin: u32, state: PinState) {
         PinState::High => unsafe { ptr::write_volatile(gpio_bsrr_addr, 1 << pin) },
         PinState::Low => unsafe { ptr::write_volatile(gpio_bsrr_addr, 1 << (pin + 16)) },
     }
+}
+
+pub fn gpio_get_pin(port: u32, pin: u32) -> bool {
+    let gpio_idr_addr = reg_addr(port, 0x10);
+    reg_get_bit(gpio_idr_addr, pin)
 }
