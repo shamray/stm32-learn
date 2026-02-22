@@ -3,8 +3,10 @@
 #![allow(clippy::empty_loop)]
 
 mod button;
+mod exti;
 mod gpio;
 mod led;
+mod reg;
 mod startup_stm32f401;
 
 use core::panic::PanicInfo;
