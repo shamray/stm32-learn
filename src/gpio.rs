@@ -45,7 +45,7 @@ pub fn gpio_init_mode(port: u32, pin: u32, mode: Mode) {
         }
         Mode::Input => {
             let gpio_pupd_reg_addr = reg::addr(port, 0x0C);
-            reg::set_bits(gpio_pupd_reg_addr, pin, 0x1, 0x3);
+            reg::set_bits(gpio_pupd_reg_addr, pin * 2, 0x1, 0x3);
         }
     }
 }
