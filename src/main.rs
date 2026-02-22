@@ -8,8 +8,6 @@ mod startup_stm32f401;
 
 use core::panic::PanicInfo;
 
-use crate::led::*;
-
 pub fn delay(duration: u32) {
     for _ in 0..duration {}
 }
@@ -19,10 +17,10 @@ pub fn blink_n(n: u8) {
 
     for i in 0..8 {
         if i < n {
-            led_on();
+            led::led_on();
         }
         delay(INTERVAL);
-        led_off();
+        led::led_off();
         delay(INTERVAL);
     }
 
@@ -31,7 +29,7 @@ pub fn blink_n(n: u8) {
 
 #[unsafe(no_mangle)]
 pub extern "C" fn main() -> ! {
-    led_init();
+    led::init();
 
     loop {
         blink_n(2);

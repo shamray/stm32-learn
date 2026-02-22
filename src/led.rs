@@ -3,7 +3,7 @@ use crate::gpio::GPIOC_BASE;
 
 pub const LED_PIN: u32 = 13;
 
-pub fn led_init() {
+pub fn init() {
     gpio::gpio_enable_clock(GPIOC_BASE);
     gpio::gpio_init_mode(
         GPIOC_BASE,
