@@ -1,16 +1,21 @@
-use crate::gpio::{GPIOC_BASE, PinState, gpio_enable_clock, gpio_init, gpio_set_pin};
+use crate::gpio;
+use crate::gpio::GPIOC_BASE;
 
 pub const LED_PIN: u32 = 13;
 
 pub fn led_init() {
-    gpio_enable_clock(GPIOC_BASE);
-    gpio_init(GPIOC_BASE, LED_PIN);
+    gpio::gpio_enable_clock(GPIOC_BASE);
+    gpio::gpio_init_mode(
+        GPIOC_BASE,
+        LED_PIN,
+        gpio::Mode::Output(gpio::OutputType::PushPull),
+    );
 }
 
 pub fn led_on() {
-    gpio_set_pin(GPIOC_BASE, LED_PIN, PinState::Low)
+    gpio::gpio_set_pin(GPIOC_BASE, LED_PIN, gpio::PinState::Low)
 }
 
 pub fn led_off() {
-    gpio_set_pin(GPIOC_BASE, LED_PIN, PinState::High)
+    gpio::gpio_set_pin(GPIOC_BASE, LED_PIN, gpio::PinState::High)
 }
