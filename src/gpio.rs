@@ -14,37 +14,16 @@ pub enum PinState {
     Low,
 }
 
+fn reg_addr(base: u32, offset: u32) -> *mut u32 {
+    (base + offset) as *mut u32
+}
+
 pub fn gpio_init(port: u32, pin: u32) {
-    let mode_offset = 0;
-    let gpio_reg_addr = (port + mode_offset) as *mut u32;
+    let gpio_mode_reg_addr = reg_addr(port, 0x00);
+    reg_set_bits(gpio_mode_reg_addr, pin * 2, 0x1, 0x3);
 
-    let bit_position = pin * 2;
-    let mode_mask = 0x3 << bit_position;
-    let mode_value = 0x1 << bit_position;
-
-    let mut gpio_mode_reg_value = unsafe { ptr::read_volatile(gpio_reg_addr) };
-
-    gpio_mode_reg_value &= !mode_mask;
-    gpio_mode_reg_value |= mode_value;
-
-    unsafe {
-        ptr::write_volatile(gpio_reg_addr, gpio_mode_reg_value);
-    }
-
-    let output_type_offset = 4;
-    let gpio_output_type_reg_addr = (port + output_type_offset) as *mut u32;
-
-    let output_type_mask = 0x1 << pin;
-    let output_type_value = 0x0;
-
-    let mut gpio_output_type_reg_value = unsafe { ptr::read_volatile(gpio_output_type_reg_addr) };
-
-    gpio_output_type_reg_value &= !output_type_mask;
-    gpio_output_type_reg_value |= output_type_value;
-
-    unsafe {
-        ptr::write_volatile(gpio_output_type_reg_addr, gpio_output_type_reg_value);
-    }
+    let gpio_output_type_reg_addr = reg_addr(port, 0x04);
+    reg_set_bits(gpio_output_type_reg_addr, pin, 0x1, 0x0);
 }
 
 fn reg_set_bit(reg_addr: *mut u32, bit_position: u32, bit_val: bool) {
@@ -57,6 +36,18 @@ fn reg_set_bit(reg_addr: *mut u32, bit_position: u32, bit_val: bool) {
     };
 
     unsafe { ptr::write_volatile(reg_addr, updated_value) }
+}
+
+fn reg_set_bits(reg_addr: *mut u32, bit_position: u32, bit_val: u32, bit_mask: u32) {
+    let mut reg_value = unsafe { ptr::read_volatile(reg_addr) };
+
+    let mode_mask = bit_mask << bit_position;
+    let mode_value = bit_val << bit_position;
+
+    reg_value &= !mode_mask;
+    reg_value |= mode_value;
+
+    unsafe { ptr::write_volatile(reg_addr, reg_value) }
 }
 
 pub fn gpio_enable_clock(port: u32) {
